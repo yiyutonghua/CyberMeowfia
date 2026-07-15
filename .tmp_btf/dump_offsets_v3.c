@@ -70,9 +70,14 @@
 
 // rt_mutex_waiter 定义来自 kernel/locking/rtmutex_common.h, 通过 ww_ctx 拉
 #include "../../../../tmp/turbo6v-kernel/kernel/locking/rtmutex_common.h"
+#include <stdio.h>
 
 #define OFF(s, f) printf("#define %-45s 0x%03lx\n", #s "_" #f "_OFF", (unsigned long)__builtin_offsetof(struct s, f))
 #define SIZE(s)   printf("#define SIZEOF_%s 0x%lx\n", #s, (unsigned long)sizeof(struct s))
+
+// 支持 struct prefix 形式
+#define SIZEOFFS(s, f) printf("#define %-45s 0x%03lx\n", #f "_OFF", (unsigned long)__builtin_offsetof(s, f))
+#define SIZESIZE(s)    printf("#define SIZEOF_%s 0x%lx\n", #s, (unsigned long)sizeof(s))
 
 int main(void) {
     SIZE(task_struct);
@@ -181,7 +186,6 @@ int main(void) {
     OFF(file_operations, lock);
     OFF(file_operations, get_unmapped_area);
     OFF(file_operations, check_flags);
-    OFF(file_operations, setfl);
     OFF(file_operations, splice_read);
     OFF(file_operations, splice_write);
     OFF(file_operations, setlease);
@@ -211,14 +215,14 @@ int main(void) {
     OFF(file, f_cred);
 
     printf("\n");
-    SIZE(struct vm_operations_struct);
-    OFF(struct vm_operations_struct, open);
-    OFF(struct vm_operations_struct, close);
-    OFF(struct vm_operations_struct, fault);
-    OFF(struct vm_operations_struct, page_mkwrite);
-    OFF(struct vm_operations_struct, access);
-    OFF(struct vm_operations_struct, name);
-    OFF(struct vm_operations_struct, mremap);
+    SIZESIZE(struct vm_operations_struct);
+    SIZEOFFS(struct vm_operations_struct, open);
+    SIZEOFFS(struct vm_operations_struct, close);
+    SIZEOFFS(struct vm_operations_struct, fault);
+    SIZEOFFS(struct vm_operations_struct, page_mkwrite);
+    SIZEOFFS(struct vm_operations_struct, access);
+    SIZEOFFS(struct vm_operations_struct, name);
+    SIZEOFFS(struct vm_operations_struct, mremap);
 
     return 0;
 }
